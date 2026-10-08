@@ -1,0 +1,26 @@
+# ============================================================
+# Render Blueprint — one-click backend deployment
+# https://render.com/docs/blueprint-spec
+# ============================================================
+services:
+  - type: web
+    name: evidence-bot-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: oregon
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///./evidence_bot.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false  # set this to your Netlify URL after deploying frontend
+      - key: FRONTEND_URL
+        sync: false  # set this to your Netlify URL after deploying frontend
+      - key: GEMINI_API_KEY
+        sync: false  # paste your Gemini API key
+      - key: RESEND_API_KEY
+        sync: false  # paste your Resend API key (optional)
