@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.models import Evidence, AIValidation, AIValidationStatus, AIRelevance, EvidenceRequestStatus, User
+from app.models import (
+    Evidence, AIValidation, AIValidationStatus, AIRelevance,
+    EvidenceRequestStatus, User, UserRole
+)
 from app.schemas import AIValidationOut
-from app.api.deps import get_reviewer_or_admin, get_current_user
+from app.api.deps import get_reviewer_user, get_current_user
 from app.services.ai.gemini import gemini_service
 from app.services.email.resend_service import email_service
 from app.config import settings
@@ -12,9 +15,18 @@ from app.utils.audit import log_audit
 router = APIRouter(prefix="/api/evidence", tags=["ai"])
 
 @router.get("/{id}/validation", response_model=AIValidationOut)
-def get_validation(id: int, db: Session = Depends(get_db)):
+def get_validation(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     ev = db.query(Evidence).filter(Evidence.id == id).first()
     if not ev:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Evidence not found")
+    if (
+        current_user.role == UserRole.BUSINESS_OWNER
+        and ev.request.review.assignment.scope.owner_user_id != current_user.id
+    ):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Evidence not found")
 
     val = db.query(AIValidation).filter(AIValidation.evidence_id == id).order_by(AIValidation.created_at.desc()).first()
@@ -26,7 +38,7 @@ def get_validation(id: int, db: Session = Depends(get_db)):
 async def revalidate_evidence(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     ev = db.query(Evidence).filter(Evidence.id == id).first()
     if not ev:

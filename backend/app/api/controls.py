@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models import Control, ControlEvidenceRequirement, User
 from app.schemas import ControlCreate, ControlUpdate, ControlOut
-from app.api.deps import get_reviewer_or_admin, get_current_user
+from app.api.deps import get_reviewer_user, get_current_user
 from app.utils.audit import log_audit
 
 router = APIRouter(prefix="/api/controls", tags=["controls"])
@@ -28,7 +28,7 @@ def list_controls(
 def create_control(
     payload: ControlCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     existing = db.query(Control).filter(Control.control_code == payload.control_code).first()
     if existing:
@@ -82,7 +82,7 @@ def update_control(
     id: int,
     payload: ControlUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     control = db.query(Control).filter(Control.id == id).first()
     if not control:

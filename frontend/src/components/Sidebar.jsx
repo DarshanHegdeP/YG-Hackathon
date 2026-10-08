@@ -8,22 +8,25 @@ import {
   CalendarCheck,
   Inbox,
   History,
-  LogOut,
-  UserCheck
+  LogOut
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const Sidebar = () => {
-  const { user, logout, isReviewer, isAdmin } = useAuth();
+  const { user, logout, isReviewer } = useAuth();
 
-  const navItems = [
+  const navItems = isReviewer ? [
     { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
     { name: 'Controls', to: '/controls', icon: ShieldCheck },
     { name: 'Scopes', to: '/scopes', icon: Target },
     { name: 'Assignments', to: '/assignments', icon: FileCheck2 },
     { name: 'Reviews', to: '/reviews', icon: CalendarCheck },
     { name: 'Evidence Requests', to: '/evidence-requests', icon: Inbox },
-    ...(isReviewer || isAdmin ? [{ name: 'Audit Logs', to: '/audit-logs', icon: History }] : []),
+    { name: 'Audit Logs', to: '/audit-logs', icon: History },
+  ] : [
+    { name: 'My Dashboard', to: '/dashboard', icon: LayoutDashboard },
+    { name: 'My Reviews', to: '/reviews', icon: CalendarCheck },
+    { name: 'My Evidence Requests', to: '/evidence-requests', icon: Inbox },
   ];
 
   return (

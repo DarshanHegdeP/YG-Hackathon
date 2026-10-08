@@ -23,6 +23,14 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const ReviewerOnlyRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="p-8 text-center text-slate-500">Loading session...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== 'REVIEWER') return <Navigate to="/dashboard" replace />;
+  return children;
+};
+
 export default function App() {
   return (
     <AuthProvider>
@@ -42,15 +50,30 @@ export default function App() {
           >
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/controls" element={<ControlsPage />} />
-            <Route path="/controls/:id" element={<ControlDetailPage />} />
-            <Route path="/scopes" element={<ScopesPage />} />
-            <Route path="/assignments" element={<AssignmentsPage />} />
+            <Route
+              path="/controls"
+              element={<ReviewerOnlyRoute><ControlsPage /></ReviewerOnlyRoute>}
+            />
+            <Route
+              path="/controls/:id"
+              element={<ReviewerOnlyRoute><ControlDetailPage /></ReviewerOnlyRoute>}
+            />
+            <Route
+              path="/scopes"
+              element={<ReviewerOnlyRoute><ScopesPage /></ReviewerOnlyRoute>}
+            />
+            <Route
+              path="/assignments"
+              element={<ReviewerOnlyRoute><AssignmentsPage /></ReviewerOnlyRoute>}
+            />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/reviews/:id" element={<ReviewDetailPage />} />
             <Route path="/evidence-requests" element={<EvidenceRequestsPage />} />
             <Route path="/evidence-requests/:id" element={<EvidenceRequestDetailPage />} />
-            <Route path="/audit-logs" element={<AuditLogsPage />} />
+            <Route
+              path="/audit-logs"
+              element={<ReviewerOnlyRoute><AuditLogsPage /></ReviewerOnlyRoute>}
+            />
           </Route>
 
           {/* Catch-all */}

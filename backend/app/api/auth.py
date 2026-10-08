@@ -21,9 +21,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         name=user_in.name,
         email=user_in.email,
         password_hash=get_password_hash(user_in.password),
-        role=user_in.role,
-        manager_id=user_in.manager_id,
-        is_active=user_in.is_active,
+        role=UserRole.BUSINESS_OWNER,
     )
     db.add(user)
     db.commit()

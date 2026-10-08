@@ -1,21 +1,35 @@
 import json
 import re
+import httpx
 from typing import Dict, Any, List, Optional
 from app.config import settings
+
 
 class GeminiValidationService:
     def __init__(self):
         self.api_key = settings.GEMINI_API_KEY
         self.model_name = settings.GEMINI_MODEL or "gemini-1.5-flash"
         self.client = None
+        self.decision_provider = settings.DECISION_PROVIDER  # "gemini" or "clef"
 
-        if self.api_key and self.api_key != "your-gemini-api-key":
+        # ── Gemini client ──────────────────────────────────────────────────
+        if self.api_key and self.api_key not in ("", "your-gemini-api-key"):
             try:
                 import google.generativeai as genai
                 genai.configure(api_key=self.api_key)
                 self.client = genai.GenerativeModel(self.model_name)
+                print(f"[GeminiService] ✅ Gemini client initialised (model: {self.model_name})")
             except Exception as e:
-                print(f"[GeminiService] Initialization error: {e}. Fallback parser will be used if needed.")
+                print(f"[GeminiService] ⚠ Gemini init error: {e}. Fallback will be used.")
+
+        # ── Cloudflare CLEF client ─────────────────────────────────────────
+        self.cf_account_id = settings.CLOUDFLARE_ACCOUNT_ID
+        self.cf_api_token = settings.CLOUDFLARE_API_TOKEN
+        self.cf_gateway_id = settings.CLOUDFLARE_AI_GATEWAY_ID
+        self.cf_model = settings.CLEF_MODEL
+
+        if settings.has_cloudflare_ai():
+            print(f"[GeminiService] ✅ Cloudflare AI available (model: {self.cf_model})")
 
     async def validate_evidence(
         self,
@@ -72,7 +86,17 @@ JSON Output Schema:
   "reason": "Detailed summary explanation of audit determination"
 }}"""
 
-        # If Gemini client is active, attempt calling Gemini
+        # ── Route to chosen AI provider ───────────────────────────────────────
+        # 1. Cloudflare CLEF (when DECISION_PROVIDER=clef)
+        if self.decision_provider == "clef" and settings.has_cloudflare_ai():
+            try:
+                result = await self._call_cloudflare_clef(system_prompt)
+                if result:
+                    return result
+            except Exception as e:
+                print(f"[GeminiService] CLEF call failed: {e}. Trying Gemini.")
+
+        # 2. Gemini
         if self.client:
             try:
                 response = self.client.generate_content(
@@ -86,16 +110,62 @@ JSON Output Schema:
                     parsed["raw_response"] = raw_text
                     return parsed
             except Exception as e:
-                print(f"[GeminiService] API call failed: {e}. Using deterministic evaluation fallback.")
+                print(f"[GeminiService] Gemini call failed: {e}. Using deterministic fallback.")
 
-        # Deterministic / Mock Rule-Based Fallback
+        # 3. Deterministic / Rule-Based Fallback
         return self._deterministic_fallback_validation(
             control_code=control_code,
             requirements=requirements,
             extracted_text=extracted_text
         )
 
+    async def _call_cloudflare_clef(self, prompt: str) -> Optional[Dict[str, Any]]:
+        """
+        Calls the Cloudflare AI Workers API (CLEF model) with the given prompt.
+        Uses the AI Gateway endpoint when CLOUDFLARE_AI_GATEWAY_ID is set.
+        """
+        # Cloudflare AI Gateway URL pattern:
+        # https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/workers-ai/{model}
+        if self.cf_gateway_id and self.cf_gateway_id != "":
+            url = (
+                f"https://gateway.ai.cloudflare.com/v1/"
+                f"{self.cf_account_id}/{self.cf_gateway_id}/workers-ai/{self.cf_model}"
+            )
+        else:
+            url = (
+                f"https://api.cloudflare.com/client/v4/accounts/"
+                f"{self.cf_account_id}/ai/run/{self.cf_model}"
+            )
+
+        headers = {
+            "Authorization": f"Bearer {self.cf_api_token}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "messages": [
+                {"role": "system", "content": "You are an expert LOD2 auditor that responds ONLY with valid JSON."},
+                {"role": "user", "content": prompt},
+            ]
+        }
+
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(url, headers=headers, json=payload)
+            resp.raise_for_status()
+            data = resp.json()
+
+        # Cloudflare response: {"result": {"response": "<text>"}, ...}
+        raw_text = (
+            data.get("result", {}).get("response", "")
+            or data.get("choices", [{}])[0].get("message", {}).get("content", "")
+        )
+        parsed = self._parse_json_response(raw_text)
+        if parsed:
+            parsed["model"] = self.cf_model
+            parsed["raw_response"] = raw_text
+        return parsed
+
     def _parse_json_response(self, text: str) -> Optional[Dict[str, Any]]:
+
         try:
             # Direct parse
             return json.loads(text)

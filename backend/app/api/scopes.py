@@ -2,9 +2,9 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.models import Scope, User
+from app.models import Scope, User, UserRole
 from app.schemas import ScopeCreate, ScopeUpdate, ScopeOut
-from app.api.deps import get_reviewer_or_admin, get_current_user
+from app.api.deps import get_reviewer_user, get_current_user
 from app.utils.audit import log_audit
 
 router = APIRouter(prefix="/api/scopes", tags=["scopes"])
@@ -35,6 +35,8 @@ def list_scopes(
     current_user: User = Depends(get_current_user)
 ):
     query = db.query(Scope)
+    if current_user.role == UserRole.BUSINESS_OWNER:
+        query = query.filter(Scope.owner_user_id == current_user.id)
     if type_filter:
         query = query.filter(Scope.type == type_filter)
     if search:
@@ -47,7 +49,7 @@ def list_scopes(
 def create_scope(
     payload: ScopeCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     scope = Scope(
         type=payload.type,
@@ -85,10 +87,12 @@ def update_scope(
     id: int,
     payload: ScopeUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     scope = db.query(Scope).filter(Scope.id == id).first()
     if not scope:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scope not found")
+    if scope.owner_user_id != current_user.id and current_user.role != UserRole.REVIEWER:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scope not found")
 
     if payload.type is not None:

@@ -5,9 +5,12 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.config import settings
 from app.db.session import get_db
-from app.models import Review, ReviewStatus, ControlAssignment, EvidenceRequest, EvidenceRequestStatus, User
+from app.models import (
+    Review, ReviewStatus, ControlAssignment, EvidenceRequest,
+    EvidenceRequestStatus, Scope, User, UserRole
+)
 from app.schemas import ReviewCreate, ReviewUpdate, ReviewOut
-from app.api.deps import get_reviewer_or_admin, get_current_user
+from app.api.deps import get_reviewer_user, get_current_user
 from app.services.email.resend_service import email_service
 from app.utils.audit import log_audit
 
@@ -25,6 +28,10 @@ def list_reviews(
     current_user: User = Depends(get_current_user)
 ):
     query = db.query(Review)
+    if current_user.role == UserRole.BUSINESS_OWNER:
+        query = query.join(ControlAssignment).join(Scope).filter(
+            Scope.owner_user_id == current_user.id
+        )
     if status_filter:
         query = query.filter(Review.status == status_filter)
     return query.order_by(Review.due_date.asc()).all()
@@ -33,7 +40,7 @@ def list_reviews(
 def create_review(
     payload: ReviewCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     assignment = db.query(ControlAssignment).filter(ControlAssignment.id == payload.control_assignment_id).first()
     if not assignment:
@@ -110,6 +117,11 @@ def get_review(id: int, db: Session = Depends(get_db), current_user: User = Depe
     review = db.query(Review).filter(Review.id == id).first()
     if not review:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Review not found")
+    if (
+        review.assignment.scope.owner_user_id != current_user.id
+        and current_user.role != UserRole.REVIEWER
+    ):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Review not found")
     return review
 
 @router.put("/{id}", response_model=ReviewOut)
@@ -117,7 +129,7 @@ def update_review(
     id: int,
     payload: ReviewUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     review = db.query(Review).filter(Review.id == id).first()
     if not review:

@@ -71,8 +71,12 @@ class EmailService:
                 print(f"[EmailService] Resend delivery error to {to_email}: {e}")
                 return "FAILED", None
         else:
-            print(f"\n[EmailService MOCK SEND] To: {to_email} | Subject: {subject}\n--- Content Preview ---\n{html_content[:200]}...\n")
-            return "SENT", "mock_msg_" + str(int(datetime.now(timezone.utc).timestamp()))
+            print(
+                f"\n[EmailService] No Resend API key configured. "
+                f"Email logged locally only. To: {to_email} | Subject: {subject}\n"
+                f"--- Content Preview ---\n{html_content[:200]}...\n"
+            )
+            return "LOGGED", None
 
     def send_initial_request(
         self,

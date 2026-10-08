@@ -17,6 +17,7 @@ import {
 import { dashboardAPI, requestsAPI } from '../services/api';
 import { StatCard } from '../components/StatCard';
 import { StatusBadge } from '../components/StatusBadge';
+import { useAuth } from '../context/AuthContext';
 
 export const DashboardPage = () => {
   const [summary, setSummary] = useState(null);
@@ -25,6 +26,7 @@ export const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [triggering, setTriggering] = useState(false);
   const [triggerMessage, setTriggerMessage] = useState(null);
+  const { isReviewer } = useAuth();
 
   const loadData = async () => {
     try {
@@ -97,14 +99,16 @@ export const DashboardPage = () => {
             <span>Refresh</span>
           </button>
 
-          <button
-            onClick={handleTriggerReminders}
-            disabled={triggering}
-            className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 shadow-sm transition-all disabled:opacity-50"
-          >
-            <BellRing className={`w-3.5 h-3.5 ${triggering ? 'animate-bounce' : ''}`} />
-            <span>{triggering ? 'Running APScheduler...' : 'Trigger Reminders & Escalations'}</span>
-          </button>
+          {isReviewer && (
+            <button
+              onClick={handleTriggerReminders}
+              disabled={triggering}
+              className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 shadow-sm transition-all disabled:opacity-50"
+            >
+              <BellRing className={`w-3.5 h-3.5 ${triggering ? 'animate-bounce' : ''}`} />
+              <span>{triggering ? 'Running APScheduler...' : 'Trigger Reminders & Escalations'}</span>
+            </button>
+          )}
         </div>
       </div>
 

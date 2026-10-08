@@ -58,10 +58,10 @@ def client(db_session):
 @pytest.fixture
 def admin_user(db_session):
     user = User(
-        name="Admin User",
+        name="Reviewer User",
         email="admin_test@example.com",
         password_hash=get_password_hash("Password123!"),
-        role=UserRole.ADMIN,
+        role=UserRole.REVIEWER,
         is_active=True
     )
     db_session.add(user)

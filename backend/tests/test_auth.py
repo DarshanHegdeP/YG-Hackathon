@@ -3,7 +3,7 @@ def test_register_and_login(client):
         "name": "New User",
         "email": "newuser@example.com",
         "password": "Password123!",
-        "role": "BUSINESS_USER"
+        "role": "BUSINESS_OWNER"
     }
     res = client.post("/api/auth/register", json=reg_payload)
     assert res.status_code == 200

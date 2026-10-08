@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timezone, timedelta
 from app.db.session import SessionLocal, engine, Base
+from app.config import settings
 from app.models import (
     User, UserRole, Scope, ScopeType, Control, ControlEvidenceRequirement,
     ControlAssignment, Review, ReviewStatus, EvidenceRequest, EvidenceRequestStatus,
@@ -15,7 +16,7 @@ def seed_database():
 
     try:
         # Check if already seeded
-        if db.query(User).filter(User.email == "admin@example.com").first():
+        if db.query(User).filter(User.email == "reviewer@example.com").first():
             print("[Seed] Database already seeded. Skipping.")
             return
 
@@ -24,36 +25,29 @@ def seed_database():
         demo_password_hash = get_password_hash("Password123!")
 
         # 1. Users
-        admin_user = User(
-            name="Alice Admin",
-            email="admin@example.com",
-            password_hash=demo_password_hash,
-            role=UserRole.ADMIN,
-            is_active=True
-        )
         reviewer_user = User(
-            name="Abhishek",
-            email="Abhishek@gmail.com",
+            name="Alice Reviewer",
+            email="reviewer@example.com",
             password_hash=demo_password_hash,
             role=UserRole.REVIEWER,
             is_active=True
         )
-        business_user = User(
-            name="Bob Business",
+        business_owner = User(
+            name="Bob Business Owner",
             email="business@example.com",
             password_hash=demo_password_hash,
-            role=UserRole.BUSINESS_USER,
+            role=UserRole.BUSINESS_OWNER,
             is_active=True
         )
         escalation_contact = User(
             name="Edward Escalation",
             email="escalation@example.com",
             password_hash=demo_password_hash,
-            role=UserRole.BUSINESS_USER,
+            role=UserRole.BUSINESS_OWNER,
             is_active=True
         )
 
-        db.add_all([admin_user, reviewer_user, business_user, escalation_contact])
+        db.add_all([reviewer_user, business_owner, escalation_contact])
         db.flush()
 
         # 2. Scopes
@@ -61,7 +55,7 @@ def seed_database():
             type=ScopeType.TEAM,
             name="IT Operations Team",
             description="Core infrastructure and system administration team",
-            owner_user_id=business_user.id,
+            owner_user_id=business_owner.id,
             email="it-ops@example.com",
             escalation_user_id=escalation_contact.id,
             metadata_json={"tier": 1, "lead": "Bob Business"}
@@ -70,7 +64,7 @@ def seed_database():
             type=ScopeType.TEAM,
             name="Finance Team",
             description="Corporate accounting and financial controllership",
-            owner_user_id=business_user.id,
+            owner_user_id=business_owner.id,
             email="finance-team@example.com",
             escalation_user_id=escalation_contact.id,
             metadata_json={"cost_center": "CC-904"}
@@ -79,7 +73,7 @@ def seed_database():
             type=ScopeType.PERSON,
             name="Jai Ram",
             description="Senior Database Administrator & Access Custodian",
-            owner_user_id=business_user.id,
+            owner_user_id=business_owner.id,
             email="jairam@gmail.com",
             escalation_user_id=escalation_contact.id,
             metadata_json={"employee_id": "EMP-4401"}
@@ -88,7 +82,7 @@ def seed_database():
             type=ScopeType.APPLICATION,
             name="Payments Application",
             description="Core real-time payment processing platform",
-            owner_user_id=business_user.id,
+            owner_user_id=business_owner.id,
             email="payments-app-owner@example.com",
             escalation_user_id=escalation_contact.id,
             metadata_json={"criticality": "TIER_0", "repo": "payments-core"}
@@ -261,8 +255,7 @@ def seed_database():
             provider_message_id="msg_resend_demo_001",
             status="SENT",
             sent_at=now - timedelta(days=2),
-            metadata_json={"submission_url": f"http://localhost:5173/submit/{token_1}"}
-        )
+            metadata_json={"submission_url": f"{settings.FRONTEND_URL}/submit/{token_1}"}        )
         comm_2_1 = Communication(
             request_id=req_2.id,
             type=CommunicationType.INITIAL_REQUEST,
@@ -271,8 +264,7 @@ def seed_database():
             provider_message_id="msg_resend_demo_002",
             status="SENT",
             sent_at=now - timedelta(days=14),
-            metadata_json={"submission_url": f"http://localhost:5173/submit/{token_2}"}
-        )
+            metadata_json={"submission_url": f"{settings.FRONTEND_URL}/submit/{token_2}"}        )
         comm_2_2 = Communication(
             request_id=req_2.id,
             type=CommunicationType.REMINDER_1,
@@ -374,7 +366,7 @@ def seed_database():
 
         # 9. Audit Logs
         log_1 = AuditLog(
-            user_id=admin_user.id,
+            user_id=reviewer_user.id,
             action="CONTROL_CREATED",
             entity_type="control",
             entity_id=ctrl_access.id,

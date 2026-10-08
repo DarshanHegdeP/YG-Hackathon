@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.models import Communication, EvidenceRequest, User
+from app.models import Communication, EvidenceRequest, Review, ControlAssignment, Scope, User, UserRole
 from app.schemas import CommunicationOut
 from app.api.deps import get_current_user
 
@@ -14,7 +14,12 @@ def get_request_communications(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    req = db.query(EvidenceRequest).filter(EvidenceRequest.id == id).first()
+    query = db.query(EvidenceRequest).filter(EvidenceRequest.id == id)
+    if current_user.role == UserRole.BUSINESS_OWNER:
+        query = query.join(Review).join(ControlAssignment).join(Scope).filter(
+            Scope.owner_user_id == current_user.id
+        )
+    req = query.first()
     if not req:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Evidence request not found")
 

@@ -7,13 +7,13 @@ from app.config import settings
 from app.db.session import get_db
 from app.models import (
     EvidenceRequest, EvidenceRequestStatus, Review, User, Scope, Control,
-    CommunicationType
+    CommunicationType, ControlAssignment, UserRole
 )
 from app.schemas import (
     EvidenceRequestCreate, EvidenceRequestUpdate, EvidenceRequestOut,
     EvidenceRequestPublicOut, EvidenceRequirementOut, EvidenceOut, AIValidationOut
 )
-from app.api.deps import get_reviewer_or_admin, get_current_user
+from app.api.deps import get_reviewer_user, get_current_user
 from app.services.email.resend_service import email_service
 from app.utils.audit import log_audit
 
@@ -29,31 +29,30 @@ def list_requests(
     status_filter: Optional[EvidenceRequestStatus] = Query(None, alias="status"),
     search: Optional[str] = Query(None),
     scope_type: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=500),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     query = db.query(EvidenceRequest)
+    if current_user.role == UserRole.BUSINESS_OWNER or scope_type:
+        query = query.join(Review).join(ControlAssignment).join(Scope).filter(
+            Scope.owner_user_id == current_user.id
+        )
     if status_filter:
         query = query.filter(EvidenceRequest.status == status_filter)
     if search:
         s = f"%{search}%"
         query = query.filter(EvidenceRequest.request_code.ilike(s))
 
-    requests = query.order_by(EvidenceRequest.created_at.desc()).all()
-
     if scope_type:
-        requests = [
-            r for r in requests
-            if r.review and r.review.assignment and r.review.assignment.scope and r.review.assignment.scope.type.value == scope_type
-        ]
-
-    return requests
+        query = query.filter(Scope.type == scope_type)
+    return query.order_by(EvidenceRequest.created_at.desc()).limit(limit).all()
 
 @router.post("", response_model=EvidenceRequestOut)
 def create_request(
     payload: EvidenceRequestCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     review = db.query(Review).filter(Review.id == payload.review_id).first()
     if not review:
@@ -157,7 +156,12 @@ def get_request_by_token(token: str, db: Session = Depends(get_db)):
 
 @router.get("/{id}", response_model=EvidenceRequestOut)
 def get_request(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    req = db.query(EvidenceRequest).filter(EvidenceRequest.id == id).first()
+    query = db.query(EvidenceRequest).filter(EvidenceRequest.id == id)
+    if current_user.role == UserRole.BUSINESS_OWNER:
+        query = query.join(Review).join(ControlAssignment).join(Scope).filter(
+            Scope.owner_user_id == current_user.id
+        )
+    req = query.first()
     if not req:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Evidence request not found")
     return req
@@ -167,7 +171,7 @@ def update_request(
     id: int,
     payload: EvidenceRequestUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     req = db.query(EvidenceRequest).filter(EvidenceRequest.id == id).first()
     if not req:
@@ -197,7 +201,7 @@ def update_request(
 def send_manual_reminder(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     req = db.query(EvidenceRequest).filter(EvidenceRequest.id == id).first()
     if not req:
@@ -235,7 +239,7 @@ def send_manual_reminder(
 def send_manual_escalation(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     req = db.query(EvidenceRequest).filter(EvidenceRequest.id == id).first()
     if not req:
@@ -275,7 +279,7 @@ def send_manual_escalation(
 def mark_request_complete(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     req = db.query(EvidenceRequest).filter(EvidenceRequest.id == id).first()
     if not req:

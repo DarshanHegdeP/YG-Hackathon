@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Lock, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Shield, Lock, Mail, ArrowRight } from 'lucide-react';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -123,26 +123,13 @@ export const LoginPage = () => {
 
               <button
                 type="button"
-                onClick={() => fillDemoAccount('admin@example.com')}
-                className="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 transition-colors"
-              >
-                <div className="flex items-center space-x-2">
-                  <span className="w-2 h-2 rounded-full bg-purple-400"></span>
-                  <span className="font-semibold text-white">Admin</span>
-                  <span className="text-slate-500">(System management)</span>
-                </div>
-                <span className="text-[10px] text-purple-400 font-mono">Fill</span>
-              </button>
-
-              <button
-                type="button"
                 onClick={() => fillDemoAccount('business@example.com')}
                 className="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 transition-colors"
               >
                 <div className="flex items-center space-x-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  <span className="font-semibold text-white">Business User</span>
-                  <span className="text-slate-500">(Submitter role)</span>
+                  <span className="font-semibold text-white">Business Owner</span>
+                  <span className="text-slate-500">(Own reviews & evidence only)</span>
                 </div>
                 <span className="text-[10px] text-emerald-400 font-mono">Fill</span>
               </button>

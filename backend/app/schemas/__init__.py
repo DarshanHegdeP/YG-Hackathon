@@ -20,11 +20,13 @@ class TokenPayload(BaseModel):
 class UserBase(BaseModel):
     name: str
     email: EmailStr
-    role: UserRole = UserRole.BUSINESS_USER
+    role: UserRole = UserRole.BUSINESS_OWNER
     manager_id: Optional[int] = None
     is_active: bool = True
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
+    name: str
+    email: EmailStr
     password: str
 
 class UserLogin(BaseModel):

@@ -2,9 +2,9 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.models import ControlAssignment, Control, Scope, User
+from app.models import ControlAssignment, Control, Scope, User, UserRole
 from app.schemas import ControlAssignmentCreate, ControlAssignmentUpdate, ControlAssignmentOut
-from app.api.deps import get_reviewer_or_admin, get_current_user
+from app.api.deps import get_reviewer_user, get_current_user
 from app.utils.audit import log_audit
 
 router = APIRouter(prefix="/api/control-assignments", tags=["assignments"])
@@ -17,6 +17,8 @@ def list_assignments(
     current_user: User = Depends(get_current_user)
 ):
     query = db.query(ControlAssignment)
+    if current_user.role == UserRole.BUSINESS_OWNER:
+        query = query.join(Scope).filter(Scope.owner_user_id == current_user.id)
     if control_id:
         query = query.filter(ControlAssignment.control_id == control_id)
     if scope_id:
@@ -27,7 +29,7 @@ def list_assignments(
 def create_assignment(
     payload: ControlAssignmentCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     # Verify control, scope, reviewer exist
     control = db.query(Control).filter(Control.id == payload.control_id).first()
@@ -75,6 +77,8 @@ def get_assignment(id: int, db: Session = Depends(get_db), current_user: User = 
     assignment = db.query(ControlAssignment).filter(ControlAssignment.id == id).first()
     if not assignment:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Control assignment not found")
+    if assignment.scope.owner_user_id != current_user.id and current_user.role != UserRole.REVIEWER:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Control assignment not found")
     return assignment
 
 @router.put("/{id}", response_model=ControlAssignmentOut)
@@ -82,7 +86,7 @@ def update_assignment(
     id: int,
     payload: ControlAssignmentUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     assignment = db.query(ControlAssignment).filter(ControlAssignment.id == id).first()
     if not assignment:

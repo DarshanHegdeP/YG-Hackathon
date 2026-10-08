@@ -12,15 +12,60 @@ services:
     plan: free
     healthCheckPath: /health
     envVars:
-      - key: DATABASE_URL
-        value: sqlite:///./evidence_bot.db
+      # ── JWT ──────────────────────────────────────────────────────────────
       - key: JWT_SECRET
         generateValue: true
-      - key: CORS_ORIGINS
-        sync: false  # set this to your Netlify URL after deploying frontend
-      - key: FRONTEND_URL
-        sync: false  # set this to your Netlify URL after deploying frontend
+
+      # ── Supabase ──────────────────────────────────────────────────────────
+      - key: SUPABASE_URL
+        value: https://beerpsrntgbrcklhqesj.supabase.co
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false   # paste from dashboard
+      - key: SUPABASE_SECRET_KEY
+        sync: false   # paste from dashboard (used as service-role key)
+
+      # ── Supabase S3 Storage ───────────────────────────────────────────────
+      - key: SUPABASE_STORAGE_BUCKET
+        value: evidence
+      - key: SUPABASE_S3_ENDPOINT
+        value: https://beerpsrntgbrcklhqesj.storage.supabase.co/storage/v1/s3
+      - key: SUPABASE_S3_REGION
+        value: ap-northeast-1
+      - key: SUPABASE_S3_ACCESS_KEY_ID
+        sync: false
+      - key: SUPABASE_S3_SECRET_ACCESS_KEY
+        sync: false
+
+      # ── Gemini AI ─────────────────────────────────────────────────────────
       - key: GEMINI_API_KEY
-        sync: false  # paste your Gemini API key
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.1-flash-lite
+
+      # ── Cloudflare AI (CLEF) ──────────────────────────────────────────────
+      - key: CLOUDFLARE_ACCOUNT_ID
+        value: 20fdb67b6176cc01d24ed92c1850c729
+      - key: CLOUDFLARE_API_TOKEN
+        sync: false
+      - key: CLOUDFLARE_AI_GATEWAY_ID
+        value: default
+      - key: CLEF_MODEL
+        value: "@cf/cloudflare/clef"
+
+      # ── Provider selection ────────────────────────────────────────────────
+      - key: EXTRACTION_PROVIDER
+        value: gemini
+      - key: DECISION_PROVIDER
+        value: clef
+
+      # ── Email ─────────────────────────────────────────────────────────────
       - key: RESEND_API_KEY
-        sync: false  # paste your Resend API key (optional)
+        sync: false
+      - key: EMAIL_FROM
+        value: onboarding@resend.dev
+
+      # ── CORS — set to your Netlify URL after deploying frontend ───────────
+      - key: CORS_ORIGINS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

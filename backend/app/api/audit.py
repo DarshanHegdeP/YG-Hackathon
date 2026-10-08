@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.models import AuditLog, User
 from app.schemas import AuditLogOut
-from app.api.deps import get_reviewer_or_admin
+from app.api.deps import get_reviewer_user
 
 router = APIRouter(prefix="/api/audit-logs", tags=["audit"])
 
@@ -14,7 +14,7 @@ def get_audit_logs(
     action: Optional[str] = Query(None),
     limit: int = Query(100, ge=1, le=500),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     query = db.query(AuditLog)
     if entity_type:

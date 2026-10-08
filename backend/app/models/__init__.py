@@ -10,9 +10,8 @@ def utc_now():
     return datetime.now(timezone.utc)
 
 class UserRole(str, enum.Enum):
-    ADMIN = "ADMIN"
     REVIEWER = "REVIEWER"
-    BUSINESS_USER = "BUSINESS_USER"
+    BUSINESS_OWNER = "BUSINESS_OWNER"
 
 class ScopeType(str, enum.Enum):
     PERSON = "PERSON"
@@ -72,7 +71,7 @@ class User(Base):
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, index=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
-    role = Column(SQLEnum(UserRole), default=UserRole.BUSINESS_USER, nullable=False)
+    role = Column(SQLEnum(UserRole), default=UserRole.BUSINESS_OWNER, nullable=False)
     manager_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=utc_now, nullable=False)

@@ -6,29 +6,66 @@ from sqlalchemy import func
 from app.db.session import get_db
 from app.models import (
     Control, ControlAssignment, Review, ReviewStatus,
-    EvidenceRequest, EvidenceRequestStatus, Scope, ScopeType, User
+    EvidenceRequest, EvidenceRequestStatus, Scope, User, UserRole
 )
 from app.schemas import DashboardSummaryOut, OverdueRequestOut, EvidenceRequestOut
-from app.api.deps import get_current_user, get_reviewer_or_admin
+from app.api.deps import get_current_user, get_reviewer_user
 from app.services.reminders.reminder_engine import reminder_engine
 
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
 @router.get("/summary", response_model=DashboardSummaryOut)
 def get_dashboard_summary(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    total_controls = db.query(Control).count()
-    active_assignments = db.query(ControlAssignment).filter(ControlAssignment.status == "ACTIVE").count()
-    active_reviews = db.query(Review).filter(Review.status.in_([ReviewStatus.OPEN, ReviewStatus.IN_PROGRESS])).count()
-    total_requests = db.query(EvidenceRequest).count()
+    owner_dashboard = current_user.role == UserRole.BUSINESS_OWNER
+    if owner_dashboard:
+        total_controls = (
+            db.query(func.count(func.distinct(ControlAssignment.control_id)))
+            .join(Scope)
+            .filter(Scope.owner_user_id == current_user.id)
+            .scalar()
+        )
+        active_assignments = (
+            db.query(ControlAssignment)
+            .join(Scope)
+            .filter(
+                Scope.owner_user_id == current_user.id,
+                ControlAssignment.status == "ACTIVE",
+            )
+            .count()
+        )
+        active_reviews_query = (
+            db.query(Review)
+            .join(ControlAssignment)
+            .join(Scope)
+            .filter(Scope.owner_user_id == current_user.id)
+        )
+        request_query = (
+            db.query(EvidenceRequest)
+            .join(Review)
+            .join(ControlAssignment)
+            .join(Scope)
+            .filter(Scope.owner_user_id == current_user.id)
+        )
+        scope_query = db.query(Scope).filter(Scope.owner_user_id == current_user.id)
+    else:
+        total_controls = db.query(Control).count()
+        active_assignments = db.query(ControlAssignment).filter(ControlAssignment.status == "ACTIVE").count()
+        active_reviews_query = db.query(Review)
+        request_query = db.query(EvidenceRequest)
+        scope_query = db.query(Scope)
 
-    complete_requests = db.query(EvidenceRequest).filter(EvidenceRequest.status == EvidenceRequestStatus.COMPLETE).count()
-    pending_requests = db.query(EvidenceRequest).filter(EvidenceRequest.status == EvidenceRequestStatus.PENDING).count()
-    incomplete_requests = db.query(EvidenceRequest).filter(EvidenceRequest.status == EvidenceRequestStatus.INCOMPLETE).count()
-    overdue_requests = db.query(EvidenceRequest).filter(EvidenceRequest.status == EvidenceRequestStatus.OVERDUE).count()
+    active_reviews = active_reviews_query.filter(
+        Review.status.in_([ReviewStatus.OPEN, ReviewStatus.IN_PROGRESS])
+    ).count()
+    total_requests = request_query.count()
+    complete_requests = request_query.filter(EvidenceRequest.status == EvidenceRequestStatus.COMPLETE).count()
+    pending_requests = request_query.filter(EvidenceRequest.status == EvidenceRequestStatus.PENDING).count()
+    incomplete_requests = request_query.filter(EvidenceRequest.status == EvidenceRequestStatus.INCOMPLETE).count()
+    overdue_requests = request_query.filter(EvidenceRequest.status == EvidenceRequestStatus.OVERDUE).count()
 
     # Status distribution
     status_counts = (
-        db.query(EvidenceRequest.status, func.count(EvidenceRequest.id))
+        request_query.with_entities(EvidenceRequest.status, func.count(EvidenceRequest.id))
         .group_by(EvidenceRequest.status)
         .all()
     )
@@ -36,7 +73,7 @@ def get_dashboard_summary(db: Session = Depends(get_db), current_user: User = De
 
     # Scope distribution
     scope_counts = (
-        db.query(Scope.type, func.count(Scope.id))
+        scope_query.with_entities(Scope.type, func.count(Scope.id))
         .group_by(Scope.type)
         .all()
     )
@@ -58,11 +95,14 @@ def get_dashboard_summary(db: Session = Depends(get_db), current_user: User = De
 @router.get("/overdue", response_model=List[OverdueRequestOut])
 def get_overdue_requests(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     now = datetime.now(timezone.utc)
-    overdue_reqs = (
-        db.query(EvidenceRequest)
-        .filter(EvidenceRequest.status == EvidenceRequestStatus.OVERDUE)
-        .all()
+    overdue_query = db.query(EvidenceRequest).filter(
+        EvidenceRequest.status == EvidenceRequestStatus.OVERDUE
     )
+    if current_user.role == UserRole.BUSINESS_OWNER:
+        overdue_query = overdue_query.join(Review).join(ControlAssignment).join(Scope).filter(
+            Scope.owner_user_id == current_user.id
+        )
+    overdue_reqs = overdue_query.all()
 
     out = []
     for req in overdue_reqs:
@@ -88,10 +128,10 @@ def get_overdue_requests(db: Session = Depends(get_db), current_user: User = Dep
 @router.post("/trigger-reminders")
 def trigger_reminders_manually(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_reviewer_or_admin)
+    current_user: User = Depends(get_reviewer_user)
 ):
     """
-    Allows reviewers and admins to manually invoke the reminder & escalation engine.
+    Allows reviewers to manually invoke the reminder & escalation engine.
     Great for hackathon demonstrations!
     """
     results = reminder_engine.process_reminders(db)
