@@ -28,10 +28,13 @@ RUN mkdir -p /app/storage_uploads
 ENV PORT=10000
 EXPOSE ${PORT}
 
-# Run the seed script (creates tables + demo data if DB is empty),
-# then start the uvicorn server.
+# On startup:
+#   1. Delete any stale SQLite DB so we always get a fresh seed
+#   2. Run the seed script (creates tables + demo data)
+#   3. Start the uvicorn server
 # Render sets the PORT env var automatically.
-CMD python -c "from app.db.seed import seed_database; seed_database()" && \
+CMD rm -f /app/evidence_bot.db && \
+    python -c "from app.db.seed import seed_database; seed_database()" && \
     uvicorn app.main:app \
         --host 0.0.0.0 \
         --port ${PORT} \
