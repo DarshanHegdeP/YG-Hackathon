@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timezone, timedelta
+from app.config import settings
 from app.db.session import SessionLocal, engine, Base
 from app.models import (
     User, UserRole, Scope, ScopeType, Control, ControlEvidenceRequirement,
@@ -261,7 +262,7 @@ def seed_database():
             provider_message_id="msg_resend_demo_001",
             status="SENT",
             sent_at=now - timedelta(days=2),
-            metadata_json={"submission_url": f"http://localhost:5173/submit/{token_1}"}
+            metadata_json={"submission_url": f"{settings.FRONTEND_URL}/submit/{token_1}"}
         )
         comm_2_1 = Communication(
             request_id=req_2.id,
@@ -271,7 +272,7 @@ def seed_database():
             provider_message_id="msg_resend_demo_002",
             status="SENT",
             sent_at=now - timedelta(days=14),
-            metadata_json={"submission_url": f"http://localhost:5173/submit/{token_2}"}
+            metadata_json={"submission_url": f"{settings.FRONTEND_URL}/submit/{token_2}"}
         )
         comm_2_2 = Communication(
             request_id=req_2.id,
