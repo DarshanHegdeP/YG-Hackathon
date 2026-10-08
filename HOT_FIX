@@ -1,0 +1,3 @@
+cd C:\Users\darsh\OneDrive\Desktop\YGHackathon\backend
+del evidence_bot.db
+python seed.py
