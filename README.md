@@ -1,130 +1,247 @@
 # 🛡️ LOD2 Evidence Bot
 ### Autonomous Control Testing & AI-Powered Evidence Collection Platform
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![React](https://img.shields.io/badge/React-18.2+-61DAFB.svg?logo=react&logoColor=black)](https://react.dev)
-[![Vite](https://img.shields.io/badge/Vite-5.1+-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-1.5_Flash-8E75B2.svg?logo=google&logoColor=white)](https://aistudio.google.com)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL_/_SQLite-Supported-336791.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-ygsupa.netlify.app-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://ygsupa.netlify.app/)
+[![Frontend Netlify](https://img.shields.io/badge/Frontend-Netlify-00C7B7.svg?style=flat-square&logo=netlify&logoColor=white)](https://ygsupa.netlify.app/)
+[![Backend Render](https://img.shields.io/badge/Backend-Render-46E3B7.svg?style=flat-square&logo=render&logoColor=white)](https://render.com)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-18.2+-61DAFB.svg?style=flat-square&logo=react&logoColor=black)](https://react.dev)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-1.5_Flash-8E75B2.svg?style=flat-square&logo=google&logoColor=white)](https://aistudio.google.com)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
 ---
 
-## 📖 Table of Contents
-1. [Project Overview](#-project-overview)
-2. [The Problem & The Solution](#-the-problem--the-solution)
-3. [Key Capabilities & Features](#-key-capabilities--features)
-4. [System Architecture](#-system-architecture)
-5. [Core Business Entities](#-core-business-entities)
-6. [Multi-Format Document Parsing & AI Verification](#-multi-format-document-parsing--ai-verification)
-7. [Automated Reminder & Escalation Engine](#-automated-reminder--escalation-engine)
-8. [Project Directory Layout](#-project-directory-layout)
-9. [Getting Started (Step-by-Step Setup Guide)](#-getting-started-step-by-step-setup-guide)
-    - [Prerequisites](#prerequisites)
-    - [Backend Setup (FastAPI)](#1-backend-setup-fastapi)
-    - [Frontend Setup (React + Vite)](#2-frontend-setup-react--vite)
-10. [Default Demo Credentials & Pre-Seeded Data](#-default-demo-credentials--pre-seeded-data)
-11. [Step-by-Step Demonstration Walkthrough](#-step-by-step-demonstration-walkthrough)
-12. [Environment Configuration Reference](#-environment-configuration-reference)
-13. [API Reference Overview](#-api-reference-overview)
-14. [Cloud Deployment Guide (Render, Supabase, Vercel)](#-cloud-deployment-guide)
-15. [Automated Testing](#-automated-testing)
-16. [Troubleshooting & FAQ](#-troubleshooting--faq)
+## 🌐 Live Production Deployment
+
+| Service | Hosting Platform | URL |
+| :--- | :--- | :--- |
+| **Frontend Web App** | **Netlify** | [👉 https://ygsupa.netlify.app/](https://ygsupa.netlify.app/) |
+| **Backend REST API** | **Render** | Dockerized FastAPI Web Service with Health Checks (`/health`) |
+
+> **🚀 Try It Live**: Visit [https://ygsupa.netlify.app/](https://ygsupa.netlify.app/) and use the **1-Click Demo Login** button on the login screen to sign in as **Alice Reviewer** with zero setup!
 
 ---
 
-## 💡 Project Overview
-
-**LOD2 Evidence Bot** is an end-to-end enterprise compliance automation system designed for **Second Line of Defense (LOD2)** control testing, internal audit, and regulatory frameworks (e.g., SOC 2, ISO 27001, SOX ITGC).
-
-In corporate risk and compliance, **Second Line of Defense (LOD2)** teams oversee whether operational teams are adhering to mandated security controls—such as quarterly user access reviews, change management sign-offs, and privilege audits. 
-
-Traditionally, this process requires human auditors to manually send hundreds of reminder emails, collect disparate attachments, inspect spreadsheets page-by-page, track overdue items on sticky notes or Excel, and maintain messy audit trails.
-
-**LOD2 Evidence Bot replaces this manual overhead with an autonomous agentic pipeline**:
-- **Automates Evidence Requests**: Initiates recurring review cycles and issues unique, token-secured submission links to business owners.
-- **Frictionless Submission**: Control owners don't need complicated logins; they upload documents through a dedicated portal link sent to their email.
-- **Multi-Format Ingestion**: Extracts structured text and tabular data from **PDF, Excel (XLSX/XLS), Word (DOCX), and CSV**.
-- **Gemini 1.5 Semantic AI Auditing**: Inspects the document content against specific, granular compliance criteria and provides confidence scores, factual audit findings, and missing checklists.
-- **Autonomous In-Process Scheduling**: Evaluates deadlines and issues staged reminders (T-2 days, T-1 day, Due date) and management escalations idempotently—without needing heavy message brokers like Redis or Celery.
-- **Tamper-Evident Integrity**: Calculates SHA-256 cryptographic hashes for every file and logs every single system action to an immutable audit trail.
+## 📑 Table of Contents
+1. [Project Description & Executive Summary](#-project-description--executive-summary)
+2. [The Real-World Problem & Our Solution](#-the-real-world-problem--our-solution)
+3. [Visual Tour & Platform Screenshots](#-visual-tour--platform-screenshots)
+4. [Tech Stack Overview](#-tech-stack-overview)
+5. [Core Features Breakdown](#-core-features-breakdown)
+6. [System Architecture & Data Flow](#-system-architecture--data-flow)
+7. [Document Extraction & Gemini AI Auditor](#-document-extraction--gemini-ai-auditor)
+8. [Autonomous Reminder & Escalation State Machine](#-autonomous-reminder--escalation-state-machine)
+9. [Project Directory Layout](#-project-directory-layout)
+10. [Dockerized Setup & Containerization](#-dockerized-setup--containerization)
+11. [How to Run Locally (Step-by-Step Guide)](#-how-to-run-locally-step-by-step-guide)
+12. [Default Demo Credentials & Pre-Seeded Data](#-default-demo-credentials--pre-seeded-data)
+13. [End-to-End Reviewer Demo Flow](#-end-to-end-reviewer-demo-flow)
+14. [Environment Configuration Reference](#-environment-configuration-reference)
+15. [REST API Reference](#-rest-api-reference)
+16. [Automated Testing Suite](#-automated-testing-suite)
+17. [Troubleshooting & FAQ](#-troubleshooting--faq)
 
 ---
 
-## 🎯 The Problem & The Solution
+## 📌 Project Description & Executive Summary
 
-| The Traditional Manual Process | The LOD2 Evidence Bot Solution |
+**LOD2 Evidence Bot** is an enterprise-grade compliance automation platform engineered for **Second Line of Defense (LOD2)** control testing, internal audit, and regulatory certification frameworks (such as **SOC 2 Type II, ISO 27001, and SOX ITGC**).
+
+### What is LOD2 (Second Line of Defense)?
+In enterprise governance, organizations divide risk management into three lines:
+1. **LOD1 (First Line / Operational Teams)**: The engineers, IT admins, and finance managers executing day-to-day operations.
+2. **LOD2 (Second Line / Risk, Compliance & Internal Controls)**: Independent reviewers who periodically test whether LOD1 teams are properly adhering to mandatory policies (e.g., *"Did IT review privileged access every 90 days?"*, *"Were production deployments approved by a Change Advisory Board?"*).
+3. **LOD3 (Third Line / External Audit)**: Independent external auditors.
+
+### What Does This Platform Do?
+The **LOD2 Evidence Bot** automates the entire end-to-end lifecycle of control testing:
+1. **Defines Reusable Controls**: Configures control standards with strict evidence requirement checklists.
+2. **Dynamic Scoping**: Maps controls to specific organizational targets (Teams, Persons, Applications, Systems) with distinct owner and escalation contacts.
+3. **Frictionless Evidence Collection**: Generates period-specific review cycles and dispatches unique, tokenized submission links to control owners. **Submitters do not need to create accounts or learn complex GRC software**.
+4. **Multi-Format Ingestion**: Parses uploaded files across **PDF, Excel (XLSX/XLS), Word (DOCX), and CSV**.
+5. **Google Gemini 1.5 Flash AI Auditor**: Objectively inspects document contents against mandatory criteria, outputting structured JSON verdicts (`COMPLETE`, `INCOMPLETE`, or `IRRELEVANT`), confidence percentages, factual findings, and missing checklists.
+6. **Autonomous Reminders & Escalations**: An in-process background scheduler (`APScheduler`) evaluates approaching deadlines and triggers staged reminders (T-2 days, T-1 day, Due date) and manager escalations idempotently—without requiring external brokers like Redis or Celery.
+7. **Tamper-Evident Audit Trail**: Every file is verified with SHA-256 cryptographic hashing, and every system event is recorded in an immutable compliance audit log.
+
+---
+
+## ⚡ The Real-World Problem & Our Solution
+
+| Traditional Manual Audit Pain Points | How LOD2 Evidence Bot Solves It |
 | :--- | :--- |
-| **Email Overload & Manual Tracking**: Reviewers send one-off emails and track responses in messy spreadsheets. | **Centralized Request Registry**: Automated reviews map controls to scopes with due dates and unique request codes (e.g., `REQ-2026-0001`). |
-| **Friction for Business Teams**: Submitters are forced to learn heavy, complex GRC software just to upload a file. | **1-Click Secure Public Portal**: Recipients get a dedicated link (`/submit/:token`) to drag-and-drop their evidence in seconds. |
-| **Subjective & Slow Review**: Reviewers take days or weeks reading through documents to check if mandatory approvals are present. | **Instant Gemini AI Verification**: In seconds, Gemini 1.5 evaluates the evidence, extracts dates and sign-offs, and returns an audit verdict (`COMPLETE` vs `INCOMPLETE`). |
-| **Human Chase Fatigue**: Auditors forget to send timely reminders or escalate delinquent submissions. | **Autonomous APScheduler Engine**: Built-in background scheduler executes daily reminder workflows and escalates overdue items automatically. |
-| **Audit Defense Headaches**: Regulators ask "Who approved what, when?" resulting in days of digging through email archives. | **Immutable Audit Trail & Timeline**: Visual communication timeline and SHA-256 file hashes establish an ironclad chain of custody. |
+| **Email Chase Fatigue**: Reviewers spend 70% of their time manually writing emails to chase submitters for evidence. | **Autonomous Background Scheduler**: In-process scheduler monitors due dates and sends staged reminders and management escalations automatically. |
+| **Submitter Friction**: Control owners are forced to learn heavy, complex enterprise GRC tools just to upload a file. | **1-Click Tokenized Public Portal**: Submitters receive a direct link (`/submit/:token`) allowing drag-and-drop submission in seconds without login. |
+| **Slow, Subjective Reviews**: Reviewers take days or weeks manually reading 50-page reports and spreadsheets to verify approvals. | **Instant Gemini 1.5 Flash AI Verification**: Extracts text and tables, checks criteria in seconds, and provides a structured audit assessment and confidence score. |
+| **Incomplete Submissions Back-and-Forth**: Submitters upload the wrong file; reviewers notice weeks later, causing missed deadlines. | **Instant Feedback Loop**: Submitter sees exactly what mandatory items are missing on the upload screen and receives an automated missing evidence notification. |
+| **Messy Evidence Repositories**: Files stored across personal inboxes, Slack channels, and shared drives. | **Centralized Cryptographic Storage**: SHA-256 hashed files, structured Supabase/local storage, and chronological timelines. |
+| **Audit Defense Nightmares**: External auditors request proof of compliance; teams spend days assembling audit logs. | **Filterable Immutable Audit Trail**: Instant export of every control change, upload, reminder, escalation, and AI verdict. |
 
 ---
 
-## ⭐ Key Capabilities & Features
+## 🖼️ Visual Tour & Platform Screenshots
 
-- 📑 **Reusable Control Catalog**: Define reusable compliance controls with mandatory/optional evidence requirements (e.g., `C001 - Periodic User Access Review` requiring Access Report, Reviewer Confirmation, Management Approval, and Exception Report).
-- 🎯 **Dynamic Organizational Scoping**: Assign controls to different target scopes: `PERSON`, `TEAM`, `DEPARTMENT`, `APPLICATION`, or `SYSTEM_OWNER`, each with its own owner email and escalation contact.
-- 🔗 **Tokenized Public Submission Portal**: Submitters access a lightweight, secure upload interface without requiring full user accounts.
-- 📄 **Deep Multi-Format Document Parsing**: Page-by-page text layout extraction for PDFs, workbook/sheet extraction for Excel, tabular/paragraph parsing for DOCX, and normalized CSV parsing.
-- 🤖 **Structured AI Audit Assessment**: Powered by Google Gemini 1.5 Flash using structured JSON responses with temperature `0.1` for maximum audit repeatability and zero hallucination.
-- ⏱️ **Lightweight In-Process Background Scheduler**: Uses `APScheduler` directly within FastAPI—no Redis, RabbitMQ, or Celery required. Runs locally or in a single container with zero extra infrastructure.
-- 🛡️ **Cryptographic Deduplication & Integrity**: Every document receives a SHA-256 checksum upon arrival.
-- 📬 **Smart Transactional Email Dispatcher**: Integrated with **Resend** for transactional notifications, with an automatic **console-logging mock fallback** for offline testing.
-- 🔌 **Zero-Configuration Offline Mode**: Runs anywhere without external cloud dependencies by falling back to **SQLite**, **local disk storage**, **mock email delivery**, and **deterministic rule-based validation**.
+### 1. Executive Control Testing Dashboard
+The central command center for compliance officers and reviewers, displaying real-time LOD2 metrics (Total Controls, Active Assignments, Active Reviews, Complete, Pending, Incomplete, Overdue), overdue alert banners, and a manual scheduler execution trigger.
+
+![Executive Control Testing Dashboard](docs/screenshots/01_dashboard.png)
 
 ---
 
-## 🏗️ System Architecture
+### 2. Internal Controls Registry
+A reusable repository of compliance controls (e.g., `C001 Periodic User Access Review`, `C002 Production Change Management Authorization`, `C003 Vulnerability Fix`). Reviewers can inspect mandatory evidence requirements, frequencies, and active statuses.
 
-The project is structured as a decoupled full-stack application:
+![Internal Controls Registry](docs/screenshots/02_controls_registry.png)
+
+---
+
+### 3. Scope & Contact Directory
+Dynamic scoping enables controls to be targeted at distinct entity types (`TEAM`, `PERSON`, `APPLICATION`, `DEPARTMENT`). Each scope maintains its own primary contact email and an independent manager escalation contact.
+
+![Scope & Contact Directory](docs/screenshots/03_scopes_directory.png)
+
+---
+
+### 4. Control Assignments
+Binds reusable controls to organizational targets and assigns a designated LOD2 reviewer, establishing testing frequency and effective dates.
+
+![Control Assignments](docs/screenshots/04_control_assignments.png)
+
+---
+
+### 5. Control Review Cycles
+Tracks time-bound testing periods (e.g., Q3 2026: 7/10/2026 to 10/8/2026), submission deadlines, and current completion statuses across all assignments.
+
+![Control Review Cycles](docs/screenshots/05_review_cycles.png)
+
+---
+
+### 6. Public Submission Portal & Gemini AI Card (Recipient Experience)
+Business users receive a direct URL (`/submit/:token`). When they upload a file, the **Gemini AI Audit Assessment Card** renders real-time audit findings:
+- **Confidence Meter**: Visual bar indicating model confidence percentage (e.g., `94%`).
+- **Verified Audit Findings**: Bullet points of factual compliance evidence found in the document.
+- **Missing Required Evidence**: Clear list of missing criteria if the status is `INCOMPLETE`.
+- **Chronological Timeline**: Full history of notifications, reminders, uploads, and acceptance events.
+
+---
+
+## 💻 Tech Stack Overview
+
+### Frontend
+- **Framework**: [React 18](https://react.dev/) (Single Page Application with Vite 5)
+- **Styling**: [Tailwind CSS 3.4](https://tailwindcss.com/) with modern slate/blue enterprise dark & light design
+- **Routing**: [React Router v6](https://reactrouter.com/) (Protected Routes + Public Tokenized Portals)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **HTTP Client**: [Axios](https://axios-http.com/) with JWT authorization interceptors and error handling
+- **Hosting**: [Netlify](https://www.netlify.com/) (configured with `_redirects` for SPA history routing)
+
+### Backend
+- **Framework**: [FastAPI 0.110+](https://fastapi.tiangolo.com/) (Asynchronous, high-performance Python REST API)
+- **Language**: Python 3.11 – 3.13
+- **ASGI Server**: [Uvicorn](https://www.uvicorn.org/) with unbuffered logging
+- **ORM & Data Layer**: [SQLAlchemy 2.0](https://www.sqlalchemy.org/) & [Alembic](https://alembic.sqlalchemy.org/)
+- **Database Support**: Dual-mode:
+  - **PostgreSQL / Supabase** (for production deployments)
+  - **SQLite** (`sqlite:///./evidence_bot.db`) (zero-configuration local fallback)
+- **Background Scheduler**: [APScheduler 3.10+](https://apscheduler.readthedocs.io/) (`BackgroundScheduler` running in-process within FastAPI lifespan)
+- **Security & Auth**: JWT (HS256) via `python-jose`, secure password hashing with `bcrypt` / `passlib`
+- **Hosting**: [Render](https://render.com/) (Docker Web Service via `render.yaml`)
+
+### Artificial Intelligence & Processing
+- **AI Model**: **Google Gemini 1.5 Flash** (`google-generativeai`)
+  - Configured with temperature `0.1` and `response_mime_type: "application/json"` for deterministic, repeatable audits.
+  - Zero-hallucination prompt instructions requiring strict adherence to provided text.
+  - **Offline Fallback**: Built-in deterministic auditor evaluates requirements if API key is not present.
+- **Multi-Format Document Parsing**:
+  - **PDF**: [PyMuPDF (`fitz`)](https://pymupdf.readthedocs.io/) for page-by-page text layout extraction
+  - **Excel**: [openpyxl](https://openpyxl.readthedocs.io/) & [pandas](https://pandas.pydata.org/) for multi-sheet enumeration and table parsing
+  - **Word**: [python-docx](https://python-docx.readthedocs.io/) for headings, paragraphs, and embedded tables
+  - **CSV**: [pandas](https://pandas.pydata.org/) for tabular normalization
+
+### Storage & Transactional Email
+- **File Storage**: [Supabase Storage](https://supabase.com/storage) S3 bucket with local disk storage fallback (`./storage_uploads`)
+- **Email Service**: [Resend](https://resend.com/) API for transactional emails, with terminal console mock logging fallback
+
+---
+
+## ✨ Core Features Breakdown
+
+### 1. Reusable Control Catalog
+Create and maintain controls with granular checklists:
+- Specify testing frequencies (`MONTHLY`, `QUARTERLY`, `SEMI-ANNUAL`, `ANNUAL`).
+- Attach multiple mandatory and optional evidence requirements.
+- Re-use the same control across dozens of departments and systems.
+
+### 2. Flexible Organizational Scoping
+Support real-world corporate hierarchies:
+- Target types: `PERSON`, `TEAM`, `DEPARTMENT`, `APPLICATION`, or `SYSTEM_OWNER`.
+- Independent recipient email and escalation contact for managers.
+
+### 3. Frictionless Tokenized Submission Portal
+- Submitters do not need to register, remember passwords, or navigate complex dashboards.
+- Each evidence request generates a cryptographically secure token (`demo-token-itops-2026-0001`).
+- Direct drag-and-drop file upload with immediate AI analysis feedback.
+
+### 4. Deep Document Extraction & Semantic Auditing
+- Parses structured text up to 35,000 characters.
+- Evaluates dates against review period windows (`period_start` to `period_end`).
+- Verifies formal manager sign-offs, ticket numbers, and exception reports.
+
+### 5. In-Process Autonomous Background Scheduler
+- Powered by `APScheduler` inside FastAPI's async lifespan.
+- Runs every 60 minutes (configurable).
+- Evaluates due dates and sends Reminder #1 (T-2 days), Reminder #2 (T-1 day), Final Reminder (Due date), and Escalations (+1 day overdue).
+- **Idempotency Guarantee**: Checks previous entries in the `communications` database table to prevent duplicate emails.
+- Manual trigger button available on the Executive Dashboard for instant testing.
+
+### 6. Cryptographic Integrity & Audit Logs
+- Every uploaded document receives a **SHA-256** checksum.
+- All actions (control creation, assignments, reviews, requests, uploads, reminders, escalations, AI verdicts) are recorded in the filterable `audit_logs` table.
+
+---
+
+## 📐 System Architecture & Data Flow
 
 ```mermaid
 flowchart TD
-    subgraph Frontend ["Frontend (React 18 + Vite + Tailwind CSS)"]
-        UI["Reviewer & Admin Dashboard"]
-        PubUI["Secure Public Submission Portal (/submit/:token)"]
-        AuditUI["Compliance Audit Logs & Timeline"]
+    subgraph Client ["Frontend Layer (Netlify)"]
+        Reviewer["Reviewer Dashboard (React 18 + Vite)"]
+        PublicPortal["Public Submission Portal (/submit/:token)"]
     end
 
-    subgraph Backend ["FastAPI Application (Python 3.11+)"]
-        API["REST API Router Layer"]
-        AuthEng["Authority Engine & Business Logic"]
-        Parser["Multi-Format Document Parser (fitz, pandas, docx)"]
-        Scheduler["In-Process APScheduler (Background Jobs)"]
+    subgraph Server ["Backend Layer (Render / Docker)"]
+        API["FastAPI REST API"]
+        AuthSvc["Auth & Permissions (JWT HS256)"]
+        Parser["Document Extraction Pipeline (PDF, XLSX, DOCX, CSV)"]
+        Scheduler["In-Process APScheduler"]
+        RuleEngine["Authority Business Logic Engine"]
     end
 
-    subgraph External ["Services & Storage Layer"]
-        DB[("PostgreSQL / SQLite Database")]
+    subgraph StorageServices ["Data & External AI Services"]
+        DB[("PostgreSQL / SQLite")]
+        Storage[("Supabase Storage / Local Disk")]
         Gemini["Google Gemini 1.5 Flash (AI Auditor)"]
         Resend["Resend API (Transactional Email)"]
-        Storage["Supabase Storage / Local File System"]
     end
 
-    UI -->|HTTPS / REST| API
-    PubUI -->|Upload & Verify| API
-    AuditUI -->|Query Logs| API
-    
-    API --> AuthEng
-    AuthEng --> Parser
-    AuthEng --> DB
-    Scheduler -->|Check Due Dates & Reminders| DB
-    Scheduler -->|Dispatch Reminders & Escalations| Resend
-    
+    Reviewer -->|REST / JWT| API
+    PublicPortal -->|Multipart Upload| API
+
+    API --> AuthSvc
+    API --> RuleEngine
+    API --> Parser
+
     Parser --> Storage
-    Parser -->|Normalized Text| Gemini
-    Gemini -->|Structured Audit JSON| AuthEng
-    AuthEng -->|Send Status Notifications| Resend
+    Parser -->|Normalized Extracted Text| Gemini
+    Gemini -->|Structured JSON Verdict| RuleEngine
+
+    RuleEngine --> DB
+    Scheduler -->|Query Due Dates| DB
+    Scheduler -->|Dispatch Reminders & Escalations| Resend
+    RuleEngine -->|Send Completion / Missing Item Notice| Resend
 ```
 
----
-
-## 🏛️ Core Business Entities
-
-The system maintains a relational hierarchy from high-level controls down to individual AI assessments:
+### Relational Entity Hierarchy
 
 ```mermaid
 flowchart TD
@@ -136,7 +253,7 @@ flowchart TD
     Rev["Reviews (Audit Cycle: Start, End, Due Date)"]
     EvReq["Evidence Request (Request Code & Secure Token)"]
     EvFile["Evidence Files (Storage Path & SHA-256)"]
-    AIVal["AI Validations (Gemini Verdict, Score, Findings)"]
+    AIVal["AI Validations (Gemini Verdict, Confidence, Findings)"]
     Comm["Communications (Sent Reminders & Escalations)"]
 
     Org --> Scope
@@ -151,21 +268,11 @@ flowchart TD
     EvReq --> Comm
 ```
 
-1. **Scope**: Represents the audit target (`IT Operations Team`, `Finance Team`, `Payments Application`). Tracks the owner's email and a manager escalation email.
-2. **Control**: Reusable compliance requirement (e.g., `C001 Periodic User Access Review`).
-3. **Control Evidence Requirement**: The specific checklist items required to satisfy the control.
-4. **Control Assignment**: Maps a Control to a Scope and assigns a compliance Reviewer.
-5. **Review**: A specific audit time window (e.g., Q3 2026: July 1 to Sept 30).
-6. **Evidence Request**: The active collection task (`REQ-2026-0001`) with a unique cryptographic `secure_token`.
-7. **Evidence**: Binary file uploaded by the submitter, persisted with a SHA-256 checksum.
-8. **AI Validation**: Structured audit assessment generated by Gemini.
-9. **Communication**: Idempotent audit record of all emails dispatched for this request.
-
 ---
 
-## 🔬 Multi-Format Document Parsing & AI Verification
+## 🤖 Document Extraction & Gemini AI Auditor
 
-When an evidence document is submitted:
+When an evidence document is uploaded:
 
 ```
 Evidence File (.pdf, .xlsx, .docx, .csv)
@@ -204,19 +311,18 @@ FastAPI Authority Engine:
   └── If INCOMPLETE ──► Request marked INCOMPLETE; Missing items email dispatched
 ```
 
-> [!NOTE]
-> **Strict Architectural Principle: AI Interprets; Backend Decides**
-> The AI never sends emails directly, alters system permissions, or modifies user accounts. It functions strictly as an objective document evaluator. The FastAPI backend validates the structured AI response and executes the workflow deterministically.
+> **Strict Architectural Principle: AI Interprets; Backend Decides**  
+> The AI never sends emails directly, alters user roles, or modifies permissions. It acts strictly as an objective evidence grader. The deterministic FastAPI backend inspects the AI's structured findings and executes state transitions accordingly.
 
 ---
 
-## ⏰ Automated Reminder & Escalation Engine
+## ⏰ Autonomous Reminder & Escalation State Machine
 
-The system features an autonomous background state machine run by **APScheduler**:
+The platform features an autonomous background scheduler that manages deadline workflows:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> PENDING: Review Initiated & Initial Request Sent
+    [*] --> PENDING: Review Initiated & Request Email Sent
     
     PENDING --> REMINDER_1: Due Date in 2 Days
     REMINDER_1 --> REMINDER_2: Due Date in 1 Day
@@ -225,37 +331,40 @@ stateDiagram-v2
     FINAL_REMINDER --> OVERDUE: Past Due Date (+1 Day)
     OVERDUE --> ESCALATED: Escalation Email Sent to Manager
     
-    PENDING --> INCOMPLETE: Evidence Uploaded (Missing Items)
+    PENDING --> INCOMPLETE: Evidence Uploaded (Missing Mandatory Items)
     INCOMPLETE --> REMINDER_1: Continues Reminder Cycle
     
     PENDING --> COMPLETE: Evidence Uploaded & Verified by Gemini
     INCOMPLETE --> COMPLETE: Supplementary Evidence Uploaded
     
-    COMPLETE --> [*]: Process Finished
+    COMPLETE --> [*]: Request Accepted & Closed
 ```
-
-### Idempotency Guarantee
-The engine checks existing records in the `communications` database table before dispatching any email. If `REMINDER_1` was already sent for `REQ-2026-0001`, it will **never** be sent again, preventing spam and ensuring repeatable audit performance across application restarts.
 
 ---
 
-## 📂 Project Directory Layout
+## 📁 Project Directory Layout
 
 ```
 YG-Hackathon/
 ├── README.md                           # Comprehensive documentation (this file)
 ├── seed.py                             # Root convenience database seeding script
-├── create_samples.py                   # Generates sample evidence files (.pdf, .xlsx, .docx, .csv)
+├── create_samples.py                   # Script to generate sample test files (.pdf, .xlsx, .docx, .csv)
 ├── render.yaml                         # Render Blueprint specification for 1-click cloud deployment
 ├── sample_evidence/                    # Realistic test evidence files
 │   ├── Complete_Access_Review_Q3_2026.pdf
 │   ├── Incomplete_User_Roster.xlsx
 │   ├── Production_Release_CAB_Signoff.docx
 │   └── System_Accounts_Export.csv
-├── docs/                               # Additional architectural guides
+├── docs/                               # System guides & specifications
 │   ├── ARCHITECTURE.md                 # Detailed architecture design specifications
 │   ├── DEMO_FLOW.md                    # 5-10 minute live presentation script
-│   └── PRE_RUN_CHECKLIST.md            # Operator checklist & troubleshooting
+│   ├── PRE_RUN_CHECKLIST.md            # Operator checklist & troubleshooting
+│   └── screenshots/                    # Real application screenshots
+│       ├── 01_dashboard.png
+│       ├── 02_controls_registry.png
+│       ├── 03_scopes_directory.png
+│       ├── 04_control_assignments.png
+│       └── 05_review_cycles.png
 │
 ├── backend/                            # FastAPI Python Backend
 │   ├── Dockerfile                      # Production container image definition
@@ -346,151 +455,167 @@ YG-Hackathon/
 
 ---
 
-## 🚀 Getting Started (Step-by-Step Setup Guide)
+## 🐳 Dockerized Setup & Containerization
 
-Follow these instructions to run the entire application locally on your machine.
+The backend is fully containerized using Docker, allowing it to run with zero host dependencies on any machine or cloud provider (e.g., Render, AWS ECS, GCP Cloud Run).
 
-### Prerequisites
+### 1. The Production Dockerfile (`backend/Dockerfile`)
+The Dockerfile uses a lightweight multi-stage Python 3.11 base image:
+- Installs dependencies without caching.
+- Creates storage upload folders.
+- Automatically seeds the database on startup.
+- Launches Uvicorn bound to the dynamic `$PORT` environment variable.
 
-Ensure you have the following installed:
-- **Python**: Version `3.10`, `3.11`, `3.12`, or `3.13` (`python --version`)
-- **Node.js**: Version `18.0+` or `20.x LTS` (`node --version`)
-- **npm**: Version `9.0+` (`npm --version`)
-- **Git**: Installed and configured (`git --version`)
+### 2. Build and Run with Docker Locally
+
+```bash
+# 1. Build the Docker image from the backend directory
+docker build -t evidence-bot-backend ./backend
+
+# 2. Run the container locally (mapped to host port 8000)
+docker run -d \
+  --name evidence-bot-backend \
+  -p 8000:10000 \
+  -e PORT=10000 \
+  -e DATABASE_URL=sqlite:///./evidence_bot.db \
+  -e JWT_SECRET=super-secret-jwt-key-32-character-min-key-12345 \
+  -e CORS_ORIGINS=http://localhost:5173,https://ygsupa.netlify.app \
+  -e FRONTEND_URL=https://ygsupa.netlify.app \
+  -e GEMINI_API_KEY="" \
+  -e RESEND_API_KEY="" \
+  evidence-bot-backend
+```
+
+- Check the container logs:
+  ```bash
+  docker logs -f evidence-bot-backend
+  ```
+- Test health endpoint:
+  ```bash
+  curl http://localhost:8000/health
+  # {"status": "ok", "service": "AI-Powered Evidence Collection Bot", "version": "1.0.0"}
+  ```
 
 ---
 
-### 1. Backend Setup (FastAPI)
+## 🛠️ How to Run Locally (Step-by-Step Guide)
 
-#### A. Create and Activate a Virtual Environment
+If you prefer to run the application directly from source code without Docker:
 
-Open a terminal in the root directory `YG-Hackathon`:
+### Prerequisites
+- **Python**: Version `3.10+` (`python --version`)
+- **Node.js**: Version `18.0+` (`node --version`)
+- **npm**: Version `9.0+` (`npm --version`)
+- **Git**: Installed and available in PATH
 
+---
+
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com/your-username/YG-Hackathon.git
+cd YG-Hackathon
+```
+
+---
+
+### Step 2: Setup and Start the Backend (FastAPI)
+
+#### A. Create and activate a Python virtual environment:
 **On Windows (PowerShell):**
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
-
 **On macOS / Linux:**
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-#### B. Install Python Dependencies
-
+#### B. Install dependencies:
 ```bash
 pip install -r backend/requirements.txt
 ```
 
-#### C. Configure Backend Environment Variables
-
-Create a `.env` file in the `backend/` folder. You can copy the provided example:
-
-**On Windows (PowerShell):**
+#### C. Configure environment variables:
+Copy the template into `backend/.env`:
 ```powershell
+# Windows PowerShell
 Copy-Item backend\.env.example backend\.env
 ```
-
-**On macOS / Linux:**
 ```bash
+# macOS / Linux
 cp backend/.env.example backend/.env
 ```
 
-> **Default Zero-Config Mode:**
-> By default, `backend/.env` uses SQLite (`DATABASE_URL=sqlite:///./evidence_bot.db`) and local file storage. You **do not need** to install PostgreSQL or setup Supabase to test locally!
+> **Zero-Config Offline Mode:**
+> By default, `backend/.env` is configured to use SQLite (`sqlite:///./evidence_bot.db`), local file storage, terminal mock emails, and rule-based validation fallback. **No cloud accounts are required to run locally!**
 > 
-> *To enable Google Gemini AI*: Obtain a free key from [Google AI Studio](https://aistudio.google.com) and add it to `GEMINI_API_KEY=your-key` in `backend/.env`. (If omitted, a built-in deterministic auditor evaluates files offline).
-> 
-> *To enable Resend Emails*: Obtain a free key from [Resend](https://resend.com) and add it to `RESEND_API_KEY=re_your_key` in `backend/.env`. (If omitted, emails are printed directly to the terminal console).
+> *To enable Google Gemini AI*: Paste your key into `GEMINI_API_KEY=` in `backend/.env` (from [Google AI Studio](https://aistudio.google.com)).
+> *To enable Resend Emails*: Paste your key into `RESEND_API_KEY=` in `backend/.env` (from [Resend](https://resend.com)).
 
-#### D. Seed the Database with Realistic Demo Data
-
-Run the database seed script to populate demo controls, scopes, users, historical reviews, and requests:
-
+#### D. Seed the database:
 ```bash
 python seed.py
 ```
 
-*Output should conclude with:*
-```
-[Seed] Successfully seeded demo users, controls, scopes, assignments, reviews, requests, and validations!
-```
-
-#### E. Start the FastAPI Server
-
-Launch the backend API server using Uvicorn:
-
+#### E. Start the FastAPI development server:
 ```bash
 uvicorn app.main:app --reload --app-dir backend --port 8000
 ```
-
-- API Base URL: **`http://localhost:8000`**
-- Interactive Swagger Documentation: **`http://localhost:8000/docs`**
-- Health Check: **`http://localhost:8000/health`**
+- API is running at: **`http://localhost:8000`**
+- Interactive Swagger API docs: **`http://localhost:8000/docs`**
 
 ---
 
-### 2. Frontend Setup (React + Vite)
+### Step 3: Setup and Start the Frontend (React + Vite)
 
-Open a **separate terminal window** in the root directory `YG-Hackathon`.
-
-#### A. Navigate to Frontend & Install Dependencies
+Open a **second terminal window** in the root directory:
 
 ```bash
 cd frontend
 npm install
 ```
 
-#### B. Configure Frontend Environment Variables
-
-Create a `.env` file inside the `frontend/` folder:
-
-**On Windows (PowerShell):**
+Configure the environment file:
 ```powershell
+# Windows PowerShell
 Copy-Item .env.example .env
 ```
-
-**On macOS / Linux:**
 ```bash
+# macOS / Linux
 cp .env.example .env
 ```
-
 Ensure `frontend/.env` contains:
 ```env
 VITE_API_BASE_URL=http://localhost:8000
 ```
 
-#### C. Start the Vite Development Server
-
+Start the Vite dev server:
 ```bash
 npm run dev
 ```
-
-- The React application will be live at: **`http://localhost:5173`**
+- The React application is running at: **`http://localhost:5173`**
 
 ---
 
-## 👥 Default Demo Credentials & Pre-Seeded Data
+## 🔑 Default Demo Credentials & Pre-Seeded Data
 
-The seed script creates four default user accounts with pre-configured roles:
+The database comes pre-seeded with ready-to-test accounts and requests:
 
-| Role | Email | Password | Access & Capabilities |
+| Role | Email | Password | Permissions & Actions |
 | :--- | :--- | :--- | :--- |
-| **Reviewer** | `Abhishek@gmail.com` *(or `reviewer@example.com`)* | `Password123!` | Executive dashboard, review initiation, manual reminders, evidence inspection |
-| **Admin** | `admin@example.com` | `Password123!` | System configuration, controls, scopes, assignments, audit logs |
-| **Business User** | `business@example.com` | `Password123!` | Evidence submission interface |
+| **Reviewer** | `reviewer@example.com` *(or `Abhishek@gmail.com`)* | `Password123!` | Executive dashboard, review initiation, manual reminders, evidence inspection |
+| **Admin** | `admin@example.com` | `Password123!` | Full system management, control creation, scope registration |
+| **Business User** | `business@example.com` | `Password123!` | Submitter role for evidence uploads |
 | **Escalation Contact** | `escalation@example.com` | `Password123!` | Manager escalation recipient for delinquent requests |
 
 > [!TIP]
-> The login screen at `http://localhost:5173/login` includes **1-Click Demo Login buttons** to quickly fill in credentials with one click.
+> Use the **1-Click Demo Login** buttons on the login screen (`/login`) to sign in instantly as Reviewer, Admin, or Business User.
 
-### Pre-Seeded Evidence Requests & Direct Links
+### Pre-Configured Evidence Requests for Testing
 
-The database includes four pre-seeded evidence requests demonstrating every state of the lifecycle:
-
-| Request Code | Target Scope | Control | Due Date Status | Secure Public Link |
+| Request Code | Scope | Control | Due Date Status | Public Upload Portal Link |
 | :--- | :--- | :--- | :--- | :--- |
 | **`REQ-2026-0001`** | `IT Operations Team` | `C001 Periodic User Access Review` | **Pending** (Due in 5 days) | [Submit REQ-2026-0001](http://localhost:5173/submit/demo-token-itops-2026-0001) |
 | **`REQ-2026-0002`** | `Finance Team` | `C001 Periodic User Access Review` | **Overdue** (3 days late) | [Submit REQ-2026-0002](http://localhost:5173/submit/demo-token-finance-2026-0002) |
@@ -499,80 +624,75 @@ The database includes four pre-seeded evidence requests demonstrating every stat
 
 ---
 
-## 🎬 Step-by-Step Demonstration Walkthrough
+## 🎯 End-to-End Reviewer Demo Flow
 
-You can follow this 5-minute walkthrough to test every feature of the bot using the files in `sample_evidence/`:
+Follow this 5-minute walkthrough to test the platform using the provided test evidence files:
 
 ### Step 1: Sign in as Reviewer
-1. Go to `http://localhost:5173/login`.
-2. Click the **Reviewer** demo button (or enter `Abhishek@gmail.com` / `Password123!`).
+1. Open `http://localhost:5173/login` (or the live URL: `https://ygsupa.netlify.app/login`).
+2. Click the **Reviewer** 1-Click button (fills `reviewer@example.com` or `Abhishek@gmail.com`).
 3. Click **Sign In**.
-4. You are greeted by the **Executive Dashboard**, showing LOD2 metrics: Total Controls, Active Assignments, Complete, Incomplete, and Overdue requests.
+4. Review the **Executive Dashboard** metrics showing controls, active assignments, and the red **Overdue Alert Banner**.
 
-### Step 2: Recipient Uploads Incomplete Evidence
-1. Navigate directly to the public submission portal for IT Operations:
-   `http://localhost:5173/submit/demo-token-itops-2026-0001`
-   *(Notice that no login is required—this simulates the link sent in the email).*
-2. Select the file: `sample_evidence/Incomplete_User_Roster.xlsx`.
+### Step 2: Upload Incomplete Evidence (Recipient Portal)
+1. Navigate directly to the public submission link for IT Operations:  
+   `http://localhost:5173/submit/demo-token-itops-2026-0001`  
+   *(Notice that no login is required—simulating the business user experience).*
+2. Upload the sample file: `sample_evidence/Incomplete_User_Roster.xlsx`.
 3. Click **Upload & Verify**.
-4. The backend extracts the Excel columns and feeds them to Gemini:
+4. The Gemini AI auditor extracts the sheet data and flags:
    - Status changes to **`INCOMPLETE`**.
-   - Gemini flags that the user roster was provided, but mandatory **`Approval Evidence`** and **`Exception Report`** are missing.
-   - The backend records a `MISSING_EVIDENCE` communication in the timeline.
+   - Gemini notes the user roster was uploaded, but flags missing **`Approval Evidence`** and **`Exception Report`**.
+   - A `MISSING_EVIDENCE` notification is recorded in the timeline.
 
-### Step 3: Recipient Uploads Complete Evidence
-1. On the same submission page, choose the comprehensive file:
-   `sample_evidence/Complete_Access_Review_Q3_2026.pdf`.
+### Step 3: Upload Complete Evidence
+1. On the same submission page, upload: `sample_evidence/Complete_Access_Review_Q3_2026.pdf`.
 2. Click **Upload & Verify**.
 3. Watch the Gemini AI verification card update in real-time:
    - Status transitions to **`COMPLETE`**.
-   - Model confidence displays at **`94%+`**.
-   - Green checklist confirms all 4 requirements (*Access Review Report*, *Reviewer Confirmation*, *Approval Evidence*, and *Exception Report*) were identified.
-   - The backend marks the request as `COMPLETE` and triggers a completion notice.
+   - Confidence score reaches **`94%+`**.
+   - All 4 mandatory requirements are marked verified.
+   - The backend marks the request as `COMPLETE` and triggers a completion email.
 
-### Step 4: Inspect Central Dashboard & Audit Timeline
-1. Return to the Reviewer interface at `http://localhost:5173/dashboard`.
-2. The request is now counted under **Complete**.
-3. Open `http://localhost:5173/evidence-requests/1` to view the **Communication & Verification Timeline**:
-   - Initial Request ➔ Incomplete Notice ➔ Upload ➔ Supplementary Upload ➔ Acceptance.
-4. Click **Audit Logs** in the sidebar: Observe the immutable audit log recording the actor, action, SHA-256 hash, and timestamp.
+### Step 4: Inspect Communication Timeline & Audit Logs
+1. Return to `http://localhost:5173/dashboard`.
+2. Notice the `Complete` counter has increased.
+3. Open `http://localhost:5173/evidence-requests/1` to view the **Communication & Verification Timeline** showing all upload and email events.
+4. Open the **Audit Logs** tab in the sidebar to verify the immutable log entries and SHA-256 checksums.
 
-### Step 5: Test the Autonomous Reminder Engine
-1. On the Dashboard, locate the red **Overdue Alert Banner** highlighting delinquent submissions from the Finance Team.
+### Step 5: Test Autonomous Reminders & Escalations
+1. On the Dashboard, find the red **Overdue Alert Banner** highlighting delinquent submissions from the Finance Team.
 2. Click the **Trigger Reminders & Escalations** button.
-3. The in-process scheduler evaluates all open requests:
-   - Sends an escalation email to the manager for `REQ-2026-0002`.
-   - Records the event in the audit trail.
-   - Updates the reminder count idempotently without duplicate notifications.
+3. The background scheduler evaluates all open requests, triggers an escalation email to the manager for `REQ-2026-0002`, updates the reminder count, and logs the action idempotently.
 
 ---
 
 ## ⚙️ Environment Configuration Reference
 
-### Backend (`backend/.env`)
+### Backend Configuration (`backend/.env`)
 
 | Variable | Default Value | Description |
 | :--- | :--- | :--- |
 | `DATABASE_URL` | `sqlite:///./evidence_bot.db` | PostgreSQL connection string or local SQLite URI |
-| `JWT_SECRET` | *(Required in prod)* | 32+ character secret key for signing HS256 tokens |
+| `JWT_SECRET` | *(Random 32+ chars)* | Secret key for signing HS256 tokens |
 | `JWT_ALGORITHM` | `HS256` | JWT signature algorithm |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `1440` (24 hours) | Token lifespan before expiration |
-| `GEMINI_API_KEY` | `""` | Google AI Studio API key (fallback enabled if blank) |
+| `GEMINI_API_KEY` | `""` | Google AI Studio API key (offline fallback if omitted) |
 | `GEMINI_MODEL` | `gemini-1.5-flash` | Gemini model name |
-| `RESEND_API_KEY` | `""` | Resend API key (terminal console fallback if blank) |
+| `RESEND_API_KEY` | `""` | Resend API key (console mock logger fallback if omitted) |
 | `EMAIL_FROM` | `onboarding@resend.dev` | Sender address for transactional emails |
-| `SUPABASE_URL` | `""` | Supabase project URL (local filesystem fallback if blank) |
+| `SUPABASE_URL` | `""` | Supabase project URL (local filesystem fallback if omitted) |
 | `SUPABASE_SERVICE_ROLE_KEY` | `""` | Supabase secret key for storage uploads |
 | `SUPABASE_STORAGE_BUCKET` | `evidence-files` | Name of storage bucket for evidence files |
 | `LOCAL_STORAGE_DIR` | `./storage_uploads` | Directory for local file persistence |
-| `FRONTEND_URL` | `http://localhost:5173` | Frontend URL for generating submission links |
-| `CORS_ORIGINS` | `http://localhost:5173,http://localhost:3000` | Allowed origins for browser CORS |
+| `FRONTEND_URL` | `http://localhost:5173` | Frontend URL used in generated submission links |
+| `CORS_ORIGINS` | `http://localhost:5173,https://ygsupa.netlify.app` | Allowed origins for browser CORS |
 | `REMINDER_INTERVAL_MINUTES` | `60` | Background scheduler check frequency |
 | `REMINDER_1_DAYS_BEFORE` | `2` | Days before due date to issue Reminder #1 |
 | `REMINDER_2_DAYS_BEFORE` | `1` | Days before due date to issue Reminder #2 |
 | `ESCALATION_DAYS_AFTER` | `1` | Days overdue before escalating to manager |
 
-### Frontend (`frontend/.env`)
+### Frontend Configuration (`frontend/.env`)
 
 | Variable | Default Value | Description |
 | :--- | :--- | :--- |
@@ -580,14 +700,14 @@ You can follow this 5-minute walkthrough to test every feature of the bot using 
 
 ---
 
-## 📡 API Reference Overview
+## 📡 REST API Reference
 
-The FastAPI backend exposes RESTful endpoints grouped by domain:
+The backend provides RESTful endpoints organized by domain:
 
 ### Authentication (`/api/auth`)
-- `POST /api/auth/register` - Create a new user account
-- `POST /api/auth/login` - Authenticate with email/password and receive a JWT
-- `GET /api/auth/me` - Retrieve authenticated user profile
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Authenticate credentials and receive JWT
+- `GET /api/auth/me` - Retrieve current user profile
 
 ### Controls & Scopes (`/api/controls`, `/api/scopes`)
 - `GET /api/controls` - List all compliance controls
@@ -619,49 +739,16 @@ The FastAPI backend exposes RESTful endpoints grouped by domain:
 
 ---
 
-## ☁️ Cloud Deployment Guide
+## 🧪 Automated Testing Suite
 
-### Deploying the Backend to Render (1-Click Blueprint)
+The backend includes automated unit and integration tests located in `backend/tests/`:
+- **`test_auth.py`**: User registration, login, JWT token generation, and role security.
+- **`test_controls_and_scopes.py`**: Controls catalog, evidence requirements, and scope assignments.
+- **`test_document_extraction.py`**: Layout parsing for PDF, multi-sheet Excel, DOCX, and CSV files.
+- **`test_ai_validation.py`**: Gemini AI validation parsing, confidence scores, and rule-based fallbacks.
+- **`test_reminder_engine.py`**: APScheduler deadline evaluations and escalation idempotency.
 
-The repository includes a `render.yaml` specification for zero-hassle Docker deployment on **Render**:
-
-1. Fork or push this repository to GitHub.
-2. Sign in to [Render](https://render.com) and click **New +** ➔ **Blueprint**.
-3. Connect your repository. Render will automatically parse `render.yaml`.
-4. Fill in your environment variables:
-   - `GEMINI_API_KEY`: Your key from Google AI Studio
-   - `RESEND_API_KEY`: Your key from Resend (optional)
-   - `CORS_ORIGINS`: Your production frontend URL (e.g. `https://your-app.vercel.app`)
-   - `FRONTEND_URL`: Your production frontend URL
-5. Click **Apply**. Render will build the Docker container and start the service with a persistent health check at `/health`.
-
-### Deploying the Frontend to Vercel or Netlify
-
-1. Sign in to [Vercel](https://vercel.com) or [Netlify](https://netlify.com).
-2. Import your GitHub repository.
-3. Configure the build settings:
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-4. Set the environment variable:
-   - `VITE_API_BASE_URL`: The URL of your deployed Render backend (e.g. `https://evidence-bot-api.onrender.com`)
-5. Click **Deploy**.
-
-*(Note: `frontend/public/_redirects` is already included to ensure client-side React routing works seamlessly on Netlify/Vercel).*
-
----
-
-## 🧪 Automated Testing
-
-The backend includes a comprehensive automated test suite in `backend/tests/` covering:
-- User registration, password verification, and JWT authentication
-- Control creation, scope assignment, and review generation
-- Multi-format document text extraction (PDF, Excel, DOCX, CSV)
-- Structured AI validation response parsing and fallbacks
-- APScheduler reminder evaluation and escalation idempotency
-
-To run the test suite:
-
+To execute the test suite:
 ```bash
 # Ensure your virtual environment is active
 pytest backend/tests/ -v
@@ -673,17 +760,16 @@ pytest backend/tests/ -v
 
 ### 1. Browser shows "CORS Error" or network request fails
 - Ensure the backend server is running on `http://localhost:8000`.
-- Verify `backend/.env` contains `CORS_ORIGINS=http://localhost:5173`.
-- Verify `frontend/.env` contains `VITE_API_BASE_URL=http://localhost:8000`.
+- Verify `backend/.env` contains your frontend origin in `CORS_ORIGINS` (e.g., `http://localhost:5173,https://ygsupa.netlify.app`).
 
 ### 2. Can I run the project without a Google Gemini API key?
-- **Yes!** The system includes a deterministic rule-based auditor fallback. If `GEMINI_API_KEY` is not provided, the service scans extracted documents against control requirements and returns structured validation results offline.
+- **Yes!** The platform includes an offline deterministic rule-based auditor fallback. If `GEMINI_API_KEY` is not provided, the service scans extracted documents against control requirements and returns structured validation results offline.
 
 ### 3. Can I run the project without a Resend email key?
-- **Yes!** If `RESEND_API_KEY` is blank, emails are not sent over the internet; instead, email subjects, bodies, and recipients are printed directly to the terminal console and recorded in the database `communications` table.
+- **Yes!** If `RESEND_API_KEY` is omitted, emails are printed directly to the terminal console and saved to the database `communications` table.
 
 ### 4. How do I reset the local database?
-- Simply delete `backend/evidence_bot.db` and run `python seed.py` from the root directory.
+- Delete `backend/evidence_bot.db` and execute `python seed.py` from the root directory.
 
 ### 5. `ModuleNotFoundError: No module named 'fitz'`
 - PyMuPDF is installed under the package name `pymupdf`. Run `pip install pymupdf` inside your active virtual environment.
